@@ -194,9 +194,16 @@ public class EditorIcons : EditorWindow
         //Debug.Log($"totals , list: {all_icons.Length} resource: {found.Count}");
         //Debug.Log($"Unique list={ unique_to_list } resources={unique_to_resources}") ;
 
-        var list_sort = ico_list.Concat(unique).ToList();
-        list_sort.Sort();
-        ico_list = list_sort.ToArray();
+        ico_list = ico_list.Concat(unique)
+                           .Distinct(StringComparer.Ordinal)
+                           .OrderBy(x => x)  // light and dark icon order is not stable, sort 2 times
+                           .OrderBy(x =>     // not ThenBy
+                            {
+                                if (x.StartsWith("d_", StringComparison.Ordinal))
+                                    return x.Substring(2);
+                                return x;
+                            })
+                            .ToArray();
 
         // Static list icons count : 1315 ( unique = 749 )
         // Found icons in resources : 1416 ( unique = 855 )
