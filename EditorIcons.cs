@@ -214,7 +214,7 @@ public class EditorIcons : EditorWindow
 
         using (new GUILayout.HorizontalScope(EditorStyles.toolbar))
         {
-            if (GUILayout.Button("Save all icons to folder...", EditorStyles.miniButton))
+if (GUILayout.Button("Save all icons to folder...", EditorStyles.miniButton))
                 SaveAllIcons();
             GUILayout.Label("Select what icons to show", GUILayout.Width(160));
             viewBigIcons = GUILayout.SelectionGrid(
@@ -247,7 +247,7 @@ public class EditorIcons : EditorWindow
 
             if (doSearch)
                 iconList = iconContentListAll.Where(x => x.tooltip.ToLower()
-                .Contains(search.ToLower())).ToList();
+              .Contains(search.ToLower())).ToList();
             else
                 iconList = viewBigIcons ? iconContentListBig : iconContentListSmall;
 
@@ -293,42 +293,69 @@ public class EditorIcons : EditorWindow
 
         using (new GUILayout.HorizontalScope(EditorStyles.helpBox, GUILayout.MaxHeight(viewBigIcons ? 140 : 120)))
         {
-            using (new GUILayout.VerticalScope(GUILayout.Width(130)))
+            using (new GUILayout.VerticalScope(GUILayout.Width(128)))
             {
-                GUILayout.Space(2);
+                GUILayout.Button(iconSelected,
+                    iconPreviewBlack,
+                    GUILayout.Width(128), GUILayout.Height(viewBigIcons ? 128 : 128/*40*/));
 
                 GUILayout.Button(iconSelected,
-                    darkPreview ? iconPreviewBlack : iconPreviewWhite,
-                    GUILayout.Width(128), GUILayout.Height(viewBigIcons ? 128 : 40));
+                    iconPreviewWhite,
+                    GUILayout.Width(128), GUILayout.Height(viewBigIcons ? 128 : 128/*40*/));
 
-                GUILayout.Space(5);
+                //GUILayout.Space(5);
 
-                darkPreview = GUILayout.SelectionGrid(
-                  darkPreview ? 1 : 0, new string[] { "Light", "Dark" },
-                  2, EditorStyles.miniButton) == 1;
+                //darkPreview = GUILayout.SelectionGrid(
+                //  darkPreview ? 1 : 0, new string[] { "Light", "Dark" },
+                //  2, EditorStyles.miniButton) == 1;
 
                 GUILayout.FlexibleSpace();
             }
-
-            GUILayout.Space(10);
 
             using (new GUILayout.VerticalScope())
             {
                 var s = $"Size: {iconSelected.image.width}x{iconSelected.image.height}";
                 s += "\nIs Pro Skin Icon: " + (iconSelected.tooltip.IndexOf("d_") == 0 ? "Yes" : "No");
                 s += $"\nTotal {iconContentListAll.Count} icons";
-                GUILayout.Space(5);
+
                 EditorGUILayout.HelpBox(s, MessageType.None);
                 GUILayout.Space(5);
                 EditorGUILayout.TextField("EditorGUIUtility.IconContent(\"" + iconSelected.tooltip + "\")");
                 GUILayout.Space(5);
+
                 if (GUILayout.Button("Copy to clipboard", EditorStyles.miniButton))
                     EditorGUIUtility.systemCopyBuffer = iconSelected.tooltip;
                 if (GUILayout.Button("Save icon to file ...", EditorStyles.miniButton))
                     SaveIcon(iconSelected.tooltip);
-            }
 
-            GUILayout.Space(10);
+
+                // USS for Unity Editor
+                var ussName = iconSelected.tooltip;
+                int isDark = 0;
+                if (ussName.StartsWith("d_", System.StringComparison.Ordinal))
+                {
+                    ussName = ussName.Substring(2);
+                    isDark = 1;
+                }
+                var iconName = ussName;
+                ussName = ".editor-icon--"
+                    + ussName.Replace(' ', '-').Replace('.', '-').Replace('@', '-').ToLowerInvariant();
+                // always export both light and dark
+                var uss = string.Empty;
+                while (isDark-- >= 0)
+                {
+                    uss += $@"{ussName} {{
+    background-image: resource('{iconName}');
+    -unity-background-scale-mode: scale-to-fit;
+    background-color: rgba(0, 0, 0, 0);
+}}
+"
+                        ;
+                    iconName = "d_" + iconName;
+                    ussName += "--dark";
+                }
+                EditorGUILayout.TextField(uss, GUILayout.ExpandHeight(true));
+            }
 
             if (GUILayout.Button("X", GUILayout.ExpandHeight(true)))
             {
@@ -345,8 +372,8 @@ public class EditorIcons : EditorWindow
     static List<GUIContent> iconContentListBig;
     static List<string> iconMissingNames;
     static GUIStyle iconButtonStyle = null;
-    static GUIStyle iconPreviewBlack = null;
-    static GUIStyle iconPreviewWhite = null;
+    static GUIStyle iconPreviewBlack;
+    static GUIStyle iconPreviewWhite;
 
     void AllTheTEXTURES(ref GUIStyle s, Texture2D t)
     {
