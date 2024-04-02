@@ -1,11 +1,11 @@
 ﻿#if UNITY_EDITOR
 
 using System;
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 public class EditorIcons : EditorWindow
 {
@@ -194,7 +194,9 @@ public class EditorIcons : EditorWindow
         //Debug.Log($"totals , list: {all_icons.Length} resource: {found.Count}");
         //Debug.Log($"Unique list={ unique_to_list } resources={unique_to_resources}") ;
 
-        ico_list = ico_list.ToList().Concat(unique).ToArray();
+        var list_sort = ico_list.Concat(unique).ToList();
+        list_sort.Sort();
+        ico_list = list_sort.ToArray();
 
         // Static list icons count : 1315 ( unique = 749 )
         // Found icons in resources : 1416 ( unique = 855 )
@@ -332,10 +334,17 @@ public class EditorIcons : EditorWindow
                 // USS for Unity Editor
                 var ussName = iconSelected.tooltip;
                 int isDark = 0;
-                if (ussName.StartsWith("d_", System.StringComparison.Ordinal))
+                if (ico_list.Contains("d_" + ussName))
                 {
-                    ussName = ussName.Substring(2);
                     isDark = 1;
+                }
+                else if (ussName.StartsWith("d_", StringComparison.Ordinal))
+                {
+                    if (ico_list.Contains(ussName.Substring(2)))
+                    {
+                        ussName = ussName.Substring(2);
+                        isDark = 1;
+                    }
                 }
                 var iconName = ussName;
                 ussName = ".editor--"
