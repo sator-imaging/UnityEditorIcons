@@ -214,7 +214,7 @@ public class EditorIcons : EditorWindow
 
         using (new GUILayout.HorizontalScope(EditorStyles.toolbar))
         {
-if (GUILayout.Button("Save all icons to folder...", EditorStyles.miniButton))
+            if (GUILayout.Button("Save all icons to folder...", EditorStyles.miniButton))
                 SaveAllIcons();
             GUILayout.Label("Select what icons to show", GUILayout.Width(160));
             viewBigIcons = GUILayout.SelectionGrid(
