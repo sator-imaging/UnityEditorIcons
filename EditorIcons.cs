@@ -338,8 +338,8 @@ public class EditorIcons : EditorWindow
                     isDark = 1;
                 }
                 var iconName = ussName;
-                ussName = ".editor-icon--"
-                    + ussName.Replace(' ', '-').Replace('.', '-').Replace('@', '-').ToLowerInvariant();
+                ussName = ".editor--"
+                    + ussName.Replace(' ', '-').Replace('.', '-').Replace('@', '-').ToLowerInvariant() + "--icon";
                 // always export both light and dark
                 var uss = string.Empty;
                 while (isDark-- >= 0)
@@ -352,7 +352,7 @@ public class EditorIcons : EditorWindow
 "
                         ;
                     iconName = "d_" + iconName;
-                    ussName += "--dark";
+                    ussName += "-dark";
                 }
                 EditorGUILayout.TextField(uss, GUILayout.ExpandHeight(true));
             }
@@ -372,8 +372,8 @@ public class EditorIcons : EditorWindow
     static List<GUIContent> iconContentListBig;
     static List<string> iconMissingNames;
     static GUIStyle iconButtonStyle = null;
-    static GUIStyle iconPreviewBlack;
-    static GUIStyle iconPreviewWhite;
+    static GUIStyle iconPreviewBlack = null;
+    static GUIStyle iconPreviewWhite = null;
 
     void AllTheTEXTURES(ref GUIStyle s, Texture2D t)
     {
