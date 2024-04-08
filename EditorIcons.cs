@@ -353,12 +353,27 @@ public class EditorIcons : EditorWindow
                         isDark = 1;
                     }
                 }
-                var iconName = ussName;
-                // remove redundant 'icon' at end
+                var iconFileName = ussName;
+                // remove redundant 'icon'
                 if (ussName.EndsWith("icon", StringComparison.OrdinalIgnoreCase))
+                    ussName = ussName[..^4];
+                if (ussName.StartsWith("icon", StringComparison.OrdinalIgnoreCase))
+                    ussName = ussName[4..];
+                var trimChars = new char[] { '-', '_', ' ', '.' };
+                foreach (var trim in trimChars)
                 {
-                    ussName = ussName[..(^4)].TrimEnd('-', '_', ' ', '.');
+                    int pos;
+                    while (true)
+                    {
+                        pos = ussName.IndexOf(trim + "icon", StringComparison.OrdinalIgnoreCase);
+                        if (pos < 0)
+                            break;
+
+                        ussName = ussName[..pos] + ussName[(pos + 5)..];
+                    }
                 }
+                ussName = ussName.Trim(trimChars);
+
                 ussName = ".editor--"
                     + ussName.Replace(' ', '-').Replace('.', '-').Replace('@', '-').ToLowerInvariant() + "--icon";
                 // always export both light and dark
@@ -366,12 +381,12 @@ public class EditorIcons : EditorWindow
                 while (isDark-- >= 0)
                 {
                     uss += $@"{ussName} {{
-    background-image: resource('{iconName}');
+    background-image: resource('{iconFileName}');
     -unity-background-scale-mode: scale-to-fit;
 }}
 "
                         ;
-                    iconName = "d_" + iconName;
+                    iconFileName = "d_" + iconFileName;
                     ussName += "-dark";
                 }
                 EditorGUILayout.TextField(uss, GUILayout.ExpandHeight(true));
