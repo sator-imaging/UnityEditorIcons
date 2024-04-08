@@ -354,6 +354,11 @@ public class EditorIcons : EditorWindow
                     }
                 }
                 var iconName = ussName;
+                // remove redundant 'icon' at end
+                if (ussName.EndsWith("icon", StringComparison.OrdinalIgnoreCase))
+                {
+                    ussName = ussName[..(^4)].TrimEnd('-', '_', ' ', '.');
+                }
                 ussName = ".editor--"
                     + ussName.Replace(' ', '-').Replace('.', '-').Replace('@', '-').ToLowerInvariant() + "--icon";
                 // always export both light and dark
@@ -363,7 +368,6 @@ public class EditorIcons : EditorWindow
                     uss += $@"{ussName} {{
     background-image: resource('{iconName}');
     -unity-background-scale-mode: scale-to-fit;
-    background-color: rgba(0, 0, 0, 0);
 }}
 "
                         ;
